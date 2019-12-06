@@ -1,10 +1,11 @@
 CC		= gcc
 LD		= ld
 
-ASFLAGS = -c -Iinclude/
-CFLAGS 	= -c -Iinclude/ -fno-stack-protector
+
+ASFLAGS = -c -Iinclude/ -O0
+CFLAGS 	= -c -Iinclude/ -fno-stack-protector -O0
 CFLAGS += -nostdlib -nostdinc -fno-builtin -fno-stack-protector 
-CFLAGS +=-nostartfiles -nodefaultlibs -ffreestanding -fno-common 
+CFLAGS += -nostartfiles -nodefaultlibs -ffreestanding -fno-common 
 CFLAGS += -Wall -Werror 
 LDFLAGS =  -Map=kernel.map -n  -o
 OBJECTS = object/

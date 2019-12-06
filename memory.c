@@ -1,6 +1,5 @@
 #include <memory.h>
 #include <kstdlib.h>
-#include <section.h>
 
 void initBSS(void)
 {

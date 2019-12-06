@@ -31,4 +31,10 @@ SECTIONS{
         *(.bss)
         _bss_end = .;
     }
+    .stack :
+    {
+        _stack_start = .;
+        *(.stack)
+        _stack_end = .;
+    }
 }
