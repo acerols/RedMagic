@@ -1,51 +1,53 @@
-CC		= gcc
-LD		= ld
+CC		= riscv64-unknown-elf-gcc
+LD		= riscv64-unknown-elf-ld
+QEMU = qemu-system-riscv64
 
-
-ASFLAGS = -c -Iinclude/ -O0
-CFLAGS 	= -c -Iinclude/ -fno-stack-protector -O0
-CFLAGS += -nostdlib -nostdinc -fno-builtin -fno-stack-protector 
-CFLAGS += -nostartfiles -nodefaultlibs -ffreestanding -fno-common 
-CFLAGS += -Wall -Werror 
-LDFLAGS =  -Map=kernel.map -n  -o
-OBJECTS = object/
+ASFLAGS = -march=rv64g -mabi=lp64 -c -Iinclude/ 
+CFLAGS 	= -march=rv64g -mabi=lp64 -c -Iinclude/  -O0
+CFLAGS += -nostdlib -mcmodel=medany -g
+#CFLAGS += -nostartfiles -nodefaultlibs -ffreestanding -fno-common 
+#CFLAGS += -Wall -Werror 
+LDFLAGS =  -static -nostdlib -Map=kernel.map -o
+OBJECTS = objs/
 
 KERNEL_BIN	= kernel.bin
 
-OBJS	= kernel_s.o kstdlib.o main.o  multiboot.o io.o
-OS		= os.iso
+OBJS	= kernel.o boot.o uart.o timervec.o trap.o timer.o lib.o
 
-all: $(OS)
+CPUS := 1
 
-multiboot.o: multiboot.S
+QEMUOPTS = -machine virt -bios none -kernel kernel.bin -m 128M -smp $(CPUS) -nographic -serial mon:stdio
+
+all: $(KERNEL_BIN)
+
+boot.o: boot.s
 	$(CC) $(ASFLAGS) $< -o $(OBJECTS)$@
 
-boot.o: boot.S
+%.o: %.s
 	$(CC) $(ASFLAGS) $< -o $(OBJECTS)$@
 
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $(OBJECTS)$@
 
-kernel_s.o: kernel_s.S
-	$(CC) $(ASFLAGS) $< -o $(OBJECTS)$@
-
 $(KERNEL_BIN): $(OBJS) 
-	$(LD) $(LDFLAGS) $(KERNEL_BIN) -T link.ld $(OBJECTS)*.o
+	$(LD) $(LDFLAGS) $(KERNEL_BIN) -T link.ld objs/kernel.o objs/uart.o boot.o objs/timervec.o objs/trap.o objs/timer.o objs/lib.o
 
-os.iso: grub.cfg $(KERNEL_BIN)
-	mkdir -p isofiles/boot/grub
-	cp grub.cfg isofiles/boot/grub/
-	cp kernel.bin isofiles/boot/
-	grub-mkrescue -o $@ isofiles/
-	$(RM) -r isofiles/
+ld:
+	$(LD) $(LDFLAGS) $(KERNEL_BIN) -T link.ld objs/kernel.o objs/uart.o boot.o timervec.o objs/trap.o objs/timer.o
+
 
 .PHONY: all
 clean:
-	$(RM) multiboot.o kernel.o kernel.bin os.iso
+	$(RM) kernel.o kernel.bin
 	$(RM) $(OBJECTS)*.o
 
-run: os.iso	
-	qemu-system-x86_64 -drive format=raw,file=$<
+run: 
+	$(QEMU) $(QEMUOPTS)
 
-debug: os.iso
-	qemu-system-x86_64 -nographic -drive format=raw,file=$< -s -S
+debug: $(KERNEL_BIN)
+	sudo $(QEMU) $(QEMUOPTS) -S -gdb tcp::1000
+	# open terminal and run gdb-multiarch kernel.bin
+	# (gdb) target remote :1000
+	# (gdb) b //breakpoint
+	# (gdb) c //continue
+	# (gdb) x //mem dump

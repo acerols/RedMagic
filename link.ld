@@ -1,40 +1,18 @@
-ENTRY(kernel_start)
-
-SECTIONS{
-    . = 1M;
-
-    .text :
-    {
-        _text_start = .;
-        *(.multiboot_header)
-        *(.text)
-        _text_end = .;
-    }
-    
-    .rodata :
-    {
-        _rodata_start = .;
-        *(.rodata)
-        _rodata_end = .;
-    }
-
-    .data :
-    {
-        _data_start = .;
-        *(.data)
-        _data_end = .;
-    }
-
-    .bss :
-    {
-        _bss_start = .;
-        *(.bss)
-        _bss_end = .;
-    }
-    .stack :
-    {
-        _stack_start = .;
-        *(.stack)
-        _stack_end = .;
-    }
-}
+OUTPUT_ARCH("riscv")
+ ENTRY(_start)
+ SECTIONS
+ {
+    . = 0x80000000;
+    test0 : { boot.o(.text) }
+    .text : { *(.text) }
+    .rodata : { *(.rodata) }
+    .data : { *(.data) }
+    .sdata : { *(.sdata) }
+    PROVIDE(_bss_start = .);
+    .bss : { *(.bss) }
+    .sbss : { *(.sbss) }
+    PROVIDE(_bss_end = .);
+    . = ALIGN(8);
+    . = . + 0x4000;
+    sp_top = .;
+ }
