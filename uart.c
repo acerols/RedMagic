@@ -54,9 +54,6 @@ void uart_init()
 void uart_puts(unsigned char *s)
 {
     while(*s != 0){
-        if(*s == '\n'){
-            uart_putc('\r');
-        }
         uart_putc(*s);
         ++s;
     }
@@ -77,7 +74,6 @@ void uart_putc(unsigned char c)
             uart_tx_w++;
             return;
         }
-        
     }
 }
 

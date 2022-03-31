@@ -133,9 +133,12 @@ trap_vector:
 
     # Invoke the handler.
     mv      a0, sp
+    mv      s0, sp
+    la      sp, trap_stack_end
     csrr    a1, mcause
     csrr    a2, mepc
     jal     trap_handler
+    mv      sp, s0
 
     # Restore registers.
     ld      ra, 8*0(sp)

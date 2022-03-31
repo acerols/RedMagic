@@ -13,6 +13,12 @@ OUTPUT_ARCH("riscv")
     .sbss : { *(.sbss) }
     PROVIDE(_bss_end = .);
     . = ALIGN(8);
-    . = . + 0x4000;
+    kernel_stack_end = .;
+    . = . + 0x10000;
     sp_top = .;
- }
+    kernel_stack_start = .;
+    trap_stack_end = .;
+    . = . + 0x10000;
+    trap_stack_start = .;
+
+}

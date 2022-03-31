@@ -30,8 +30,9 @@ boot.o: boot.s
 	$(CC) $(CFLAGS) $< -o $(OBJECTS)$@
 
 $(KERNEL_BIN): $(OBJS) 
-	$(LD) $(LDFLAGS) $(KERNEL_BIN) -T link.ld objs/kernel.o objs/uart.o boot.o objs/timervec.o objs/trap.o objs/timer.o objs/lib.o
-
+	$(LD) $(LDFLAGS) $(KERNEL_BIN) -T link.ld objs/kernel.o objs/uart.o boot.o objs/timervec.o objs/trap.o objs/timer.o objs/lib.o -g
+	riscv64-unknown-elf-objdump -d $(KERNEL_BIN) > $(KERNEL_BIN).dump
+	
 ld:
 	$(LD) $(LDFLAGS) $(KERNEL_BIN) -T link.ld objs/kernel.o objs/uart.o boot.o timervec.o objs/trap.o objs/timer.o
 

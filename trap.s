@@ -3,7 +3,7 @@
 .type trap_vectors, @function
 .balign 256
 
-.equ ARCH_BIT,      8
+.equ ARCH_BIT,      4
 
 trap_vectors:
     j   undefined_handler   /* user software interrupt */
