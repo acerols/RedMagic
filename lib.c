@@ -51,6 +51,27 @@ void bin2str(uint64 bin, char *str)
     str[index] = '\0';
 }
 
+void hex2strd(uint64 hex, char *str, int digit)
+{
+    int index = 0;
+    while(hex > 0){
+        str[index++] = hex % 16;
+        hex /= 16;
+    }
+    // reverse str
+    for(int i = 0; i < index / 2; i++){
+        char tmp = str[i];
+        str[i] = str[index - i - 1];
+        str[index - i - 1] = tmp;
+    }
+    str[index] = '\0';
+    // add 0
+    for(int i = 0; i < digit - index; i++){
+        str[i] = '0';
+    }
+    str[digit] = '\0';
+}
+
 void hex2str(uint64 hex, char *str)
 {
     int index = 0;
@@ -71,4 +92,23 @@ void hex2str(uint64 hex, char *str)
         str[index - i - 1] = tmp;
     }
     str[index] = '\0';
+}
+
+void memset(void *dest, uint64 val, uint64 size)
+{
+    uint64 *p = (uint64 *)dest;
+    for(int i = 0; i < size / 8; i++){
+        p[i] = val;
+    }
+}
+
+extern void *heap_space;
+extern void *heap_space_end;
+
+void *malloc(uint64 size)
+{
+    static uint64 index = 0;
+    void *p = (void *)(heap_space + index);
+    index += size;
+    return p;
 }

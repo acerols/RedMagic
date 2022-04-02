@@ -46,7 +46,7 @@ run:
 	$(QEMU) $(QEMUOPTS)
 
 debug: $(KERNEL_BIN)
-	sudo $(QEMU) $(QEMUOPTS) -S -gdb tcp::1000
+	sudo $(QEMU) $(QEMUOPTS) -S -gdb tcp::1001
 	# open terminal and run gdb-multiarch kernel.bin
 	# (gdb) target remote :1000
 	# (gdb) b //breakpoint
