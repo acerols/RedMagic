@@ -1,1 +1,0 @@
-void kmemset(void *str, unsigned char c, int size);
